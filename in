@@ -15,6 +15,7 @@ cat > $payload <&0
 
 # Parse URLs for settings.xml and settings-security.xml
 settings_url=$(jq -r '.source.settings.url // ""' < $payload)
+project_path=$(jq -r '.source.settings.project-path // ""' < $payload)
 master_password=$(jq -r '.source."master-password" // ""' < $payload)
 
 # Download settings.xml file if specified
@@ -34,7 +35,7 @@ git_dir="$(mktemp -d -t git-resource-destination.XXXXXX)"
 /opt/resource/git/in "$git_dir" < $payload >&3
 
 # Check for pom.xml
-cd "$git_dir"
+cd "$git_dir/$project_path"
 [[ -f pom.xml ]] || { echo "There is no pom.xml in the git repo."; exit 1; }
 
 # Use maven dependency plugin to cache dependencies
